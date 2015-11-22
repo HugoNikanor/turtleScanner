@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.Headers;
@@ -14,7 +13,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-// This should maybe extend htttServer
 public class ServerRoot {
 
 	private HttpServer server;
@@ -24,7 +22,6 @@ public class ServerRoot {
 		try {
 			// Localhost doesn't require root
 			server = HttpServer.create(new InetSocketAddress("localhost", 10000), 0);
-			server.createContext("/server", new Handler());
 			server.createContext("/", new Handler());
 			server.setExecutor(Executors.newCachedThreadPool());
 		} catch (IOException e) {
@@ -71,26 +68,25 @@ public class ServerRoot {
 				while( (content = req.read()) != -1 ) {
 					dataString = dataString.concat(Character.toString((char)content));
 				}
-				String testString = new String("test");
-
 
 				Headers respHead = e.getResponseHeaders();
 				respHead.set("content-type", "text/plain");
 				e.sendResponseHeaders(200, 0);
 
-				OutputStream resp = e.getResponseBody();
+				OutputStream output = e.getResponseBody();
 
 
-				if( Objects.equals(dataString, testString) ) {
-					resp.write("test message recieved".getBytes());
-				} else {
-					resp.write("unidentified request".getBytes());
+				switch(dataString) {
+					case "test":
+						output.write("test recieved".getBytes());
+						break;
+					case "other":
+						output.write("other recieved".getBytes());
+						break;
 				}
 
 				req.close();
-				resp.close();
-
-
+				output.close();
 			}
 			e.close();
 		}

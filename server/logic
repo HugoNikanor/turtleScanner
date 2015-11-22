@@ -1,0 +1,9 @@
+for each move
+	go right
+	if that fails
+		go left
+		if that fails
+			go left until you can go down
+			if you cant go any more left and cant go down
+				go right until you can go up
+				then go up until you can go right
